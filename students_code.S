@@ -92,6 +92,41 @@ hamming_weight:
 
 
 negate_first_k:
+  # rdi = codeword, rsi = num of bits
+  pushq %rbp
+  movq %rsp, %rbp
+
+  xor %rbx, %rbx # bl is current byte
+  movq $0, %r8 # current byte index (0, 1, ..., 6, 7)
+  negate_loop:
+  mov %rsi, %rax
+  movq $0, %rdx # bits to NOT in byte
+  movq $8, %rcx # divisor
+  div %rcx
+  # now rdx contains num of bits to NOT in current byte
+  cmp $0, %rax # quotient is 0?
+  je last_byte_negate
+  movb (%rdi, %r8, 1), %bl
+  not %bl
+  movb %bl, (%rdi, %r8, 1)
+  inc %r8
+  sub $8, %rsi
+  jmp negate_loop
+
+
+  last_byte_negate:
+  cmp $0, %rdx # remainder is 0?
+  je finish_negate
+  movb (%rdi, %r8, 1), %bl
+  movq $8, %rcx
+  sub %rdx, %rcx
+  sll %rcx, %rbx
+  not %bl
+  slr %rdx, %rbx
+  movb %bl, (%rdi, %r8, 1)
+
+  finish_negate:
+  leave
   ret
 
 bring_balance_to_the_word:

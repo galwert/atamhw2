@@ -78,20 +78,59 @@ read_input:
 hamming_weight:
 pushq %rbp
   movq %rsp, %rbp
-  mov %rdi, %r9 # r9 holds address to codeword(function parameter)
-  movq 0, %rbx # counter for number of of words passed
-  movq $0, %rcx
-hamming_weight_loop:
-leaq %rcx(%r9, %rbx,8)
-cmpq $8, 
-movq $0, %rcx
+  movq $0, %rbx # counter for number of of words passed
+  movq $0, %rcx # counter for the number of bytes passed in word
+  movq $0, %rax # counter for the number of 1 bits found
 
-hamming_weight_finsihed:
-leave
+  hamming_weight_loop:
+  leaq (%rdi,%rbx,8), %r9
+  movq (%r9,%rcx,1), %r9 
+  cmpq $8, %rcx
+  
+  inc %rcx
+  je passed_word
+  inner_loop:
+  cmpq $0,%r9
+  je passed_word
+  test $1,%r9 
+  jz bit_processed
+  inc %rax
+  bit_processed:
+  shr $1,%r9
+  jmp inner_loop
+
+
+  passed_word:
+  movq $0, %rcx
+  inc %rbx
+  cmpq %rbx, %rsi # finsihed all
+  je hamming_weight_finished
+  jmp hamming_weight_loop
+  hamming_weight_finished:
+  leave
   ret
 
 negate_first_k:
   ret
 
 bring_balance_to_the_word:
+pushq %rbp
+  movq %rsp, %rbp
+  movq $0, %rax # counter
+  pushq %rax
+  pushq %rdi
+  pushq %rsi
+  
+  popq %rsi
+  popq %rdi
+  popq %rax
+  balance_loop:
+  pushq %rax
+  pushq %rdi
+  pushq %rsi
+
+  popq %rsi
+  popq %rdi
+  popq %rax
+
   ret

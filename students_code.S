@@ -76,6 +76,18 @@ read_input:
   ret
 
 hamming_weight:
+pushq %rbp
+  movq %rsp, %rbp
+  mov %rdi, %r9 # r9 holds address to codeword(function parameter)
+  movq 0, %rbx # counter for number of of words passed
+  movq $0, %rcx
+hamming_weight_loop:
+leaq %rcx(%r9, %rbx,8)
+cmpq $8, 
+movq $0, %rcx
+
+hamming_weight_finsihed:
+leave
   ret
 
 negate_first_k:

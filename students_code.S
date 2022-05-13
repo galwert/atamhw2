@@ -115,6 +115,8 @@ negate_first_k:
   # rdi = codeword, rsi = num of bits
   pushq %rbp
   movq %rsp, %rbp
+  
+  pushq %rdi
 
   xor %rbx, %rbx # bl is current byte
   movq $0, %r8 # current byte index (0, 1, ..., 6, 7)
@@ -126,24 +128,24 @@ negate_first_k:
   # now rdx contains num of bits to NOT in current byte
   cmp $0, %rax # quotient is 0?
   je last_byte_negate
-  movb (%rdi, %r8, 1), %bl
+  movb (%rsp, %r8, 1), %bl
   not %bl
-  movb %bl, (%rdi, %r8, 1)
+  movb %bl, (%rsp, %r8, 1)
   inc %r8
   sub $8, %rsi
   jmp negate_loop
 
-
   last_byte_negate:
   cmp $0, %rdx # remainder is 0?
   je finish_negate
-  movb (%rdi, %r8, 1), %bl
+  movb (%rsp, %r8, 1), %bl
   movq $8, %rcx
   sub %rdx, %rcx
-  sll %rcx, %rbx
+  shl %cl, %rbx
   not %bl
-  slr %rdx, %rbx
-  movb %bl, (%rdi, %r8, 1)
+  shr %cl, %rbx
+  movb %bl, (%rsp, %r8, 1)
+  popq %rax
 
   finish_negate:
   leave

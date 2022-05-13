@@ -86,7 +86,7 @@ leaq %rcx(%r9, %rbx,8)
 cmpq $8, 
 movq $0, %rcx
 
-hamming_weight_finsihed:
+hamming_weight_finished:
 leave
   ret
 
